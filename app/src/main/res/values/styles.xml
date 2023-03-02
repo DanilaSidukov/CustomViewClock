@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+
+    <style name="HourHand">
+        <item name="color_hour">?color_hour</item>
+    </style>
+
+    <style name="MinuteHand">
+        <item name="color_minute">?color_minute</item>
+    </style>
+
+    <style name="SecondHand">
+        <item name="color_second">?color_second</item>
+    </style>
+
+</resources>
