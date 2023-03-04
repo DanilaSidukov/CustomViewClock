@@ -4,16 +4,18 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
+import android.graphics.Color.BLACK
 import android.graphics.Paint
 import android.os.Build
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.core.animation.doOnEnd
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.withRotation
 import com.sidukov.customviewclock.R
@@ -30,18 +32,9 @@ class ClockView @JvmOverloads constructor(
     private var angleSecond = 0f
     private var angleMinute = 0f
     private var angleHour = 0f
-
-    private var startRange = LocalDateTime.now().second * 6f
-    private var secondCounter = 0
-//    private var booleanStartSecond = false
-//    private var startRange: (Float) -> Float = {
-//        if (booleanStartSecond){
-//            0f
-//        } else {
-//            booleanStartSecond = true
-//            LocalDateTime.now().second.toFloat() * 6f
-//        }
-//    }
+    private var hour =
+        if (LocalDateTime.now().hour.toFloat() < 13) calculateHour(LocalDateTime.now().hour.toFloat())
+        else calculateHour(LocalDateTime.now().hour.toFloat() - 12)
 
     private val DURATION_SECOND = 60000L
     private val DURATION_MINUTE = 3600000L
@@ -49,34 +42,21 @@ class ClockView @JvmOverloads constructor(
 
     private var imageClock: ImageView
 
-
-    private val handPaint = Paint().apply {
-        isAntiAlias = true
-        strokeWidth = 5f
-        style = Paint.Style.STROKE
-    }
-
-    private val hourHandPaint = Paint().apply {
-        isAntiAlias = true
-        strokeWidth = 6f
-        style = Paint.Style.STROKE
-    }
+    lateinit var handSecond: Paint
+    lateinit var handMinute: Paint
+    lateinit var handHour: Paint
 
     init {
         val view = View.inflate(context, R.layout.clock_layout, this)
         imageClock = view.findViewById(R.id.image_clock)
-        context.withStyledAttributes(attrs, R.styleable.ClockView) {
-            handPaint.apply {
-                color = getColor(R.styleable.ClockView_color_second, Color.BLACK)
-            }
-            hourHandPaint.apply {
-                color = getColor(R.styleable.ClockView_color_hour, Color.BLACK)
-            }
-        }
+
+        handSecond = paintHand(attrs, 1)
+        handMinute = paintHand(attrs, 2)
+        handHour = paintHand(attrs, 3)
 
         angleSecond = (LocalDateTime.now().second.toFloat() * 6f)
         angleMinute = (LocalDateTime.now().minute.toFloat() * 6f)
-        angleHour = (LocalDateTime.now().hour.toFloat() * 15f)
+        angleHour = hour * 30f
 
         setWillNotDraw(false)
 
@@ -84,6 +64,47 @@ class ClockView @JvmOverloads constructor(
         animateHand(angleMinute, DURATION_MINUTE,  2)
         animateHand(angleHour, DURATION_HOUR,  3)
 
+    }
+
+    private fun calculateHour(hour: Float): Float {
+        return hour + (LocalDateTime.now().minute.toFloat() * 0.015f)
+    }
+
+    @SuppressLint("ResourceAsColor")
+    private fun paintHand(attrs: AttributeSet?, handCode: Int): Paint{
+        val hand = Paint().apply {
+            isAntiAlias = true
+            strokeWidth = getHandWidth(attrs, handCode)
+            style = Paint.Style.STROKE
+        }
+        context.withStyledAttributes(attrs, R.styleable.ClockView)  {
+            hand.apply {
+                color = getHandColor(attrs, handCode)
+            }
+        }
+        return hand
+    }
+
+    @SuppressLint("Recycle")
+    private fun getHandWidth(attrs: AttributeSet?, code: Int): Float {
+        val view = context.obtainStyledAttributes(attrs, R.styleable.ClockView)
+        return when(code){
+            1 -> view.getFloat(R.styleable.ClockView_second_hand_width, 7f)
+            2 -> view.getFloat(R.styleable.ClockView_minute_hand_width, 8f)
+            3 -> view.getFloat(R.styleable.ClockView_hour_hand_width, 9f)
+            else -> 7f
+        }
+    }
+
+    @SuppressLint("Recycle")
+    private fun getHandColor(attrs: AttributeSet?, code: Int): Int{
+        val view = context.obtainStyledAttributes(attrs, R.styleable.ClockView)
+        return when(code){
+            1 -> view.getColor(R.styleable.ClockView_color_second, BLACK)
+            2 -> view.getColor(R.styleable.ClockView_color_minute, BLACK)
+            3 -> view.getColor(R.styleable.ClockView_color_hour, BLACK)
+            else -> BLACK
+        }
     }
 
     private fun animateHand(
@@ -170,10 +191,10 @@ class ClockView @JvmOverloads constructor(
         ) {
             drawLine(
                 imageClock.measuredWidth / 2f,
-                imageClock.measuredHeight / 2f,
+                imageClock.measuredHeight / 1.87f,
                 imageClock.measuredWidth / 2f,
-                imageClock.top.toFloat() + (imageClock.height / 6),
-                handPaint
+                imageClock.top.toFloat() + (imageClock.height / 5.5f),
+                handSecond
             )
         }
         canvas.withRotation(angleMinute,
@@ -182,10 +203,10 @@ class ClockView @JvmOverloads constructor(
         ) {
             drawLine(
                 imageClock.measuredWidth / 2f,
-                imageClock.measuredHeight / 2f,
+                imageClock.measuredHeight / 1.9f,
                 imageClock.measuredWidth / 2f,
                 imageClock.top.toFloat() + (imageClock.height / 6),
-                handPaint
+                handMinute
             )
         }
         canvas.withRotation(angleHour,
@@ -194,10 +215,10 @@ class ClockView @JvmOverloads constructor(
         ) {
             drawLine(
                 imageClock.measuredWidth / 2f,
-                imageClock.measuredHeight / 2f,
+                imageClock.measuredHeight / 1.9f,
                 imageClock.measuredWidth / 2f,
                 imageClock.top.toFloat() + (imageClock.height / 4),
-                handPaint
+                handHour
             )
         }
     }

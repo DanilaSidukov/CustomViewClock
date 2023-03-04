@@ -15,6 +15,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:color_hour="@color/color_hour"
+        app:color_second="@color/color_second"
+        app:color_minute="@color/color_minute"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
