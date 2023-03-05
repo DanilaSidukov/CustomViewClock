@@ -2,20 +2,16 @@
 <resources>
 
     <declare-styleable name="ClockView">
-        <attr name="color_hour" format="color" />
-        <attr name="color_second" format="color" />
-        <attr name="color_minute" format="color" />
-        <attr name="second_hand_width" format="float" />
-        <attr name="minute_hand_width" format="float" />
-        <attr name="hour_hand_width" format="float" />
+        <attr name="hourHandColor" format="reference" />
+        <attr name="secondHandColor" format="reference" />
+        <attr name="minuteHandColor" format="reference" />
+        <attr name="secondHandWidth" format="float" />
+        <attr name="minuteHandWidth" format="float" />
+        <attr name="hourHandWidth" format="float" />
     </declare-styleable>
 
-<!--    <attr name="color_hour" format="color" />-->
-<!--    <attr name="color_minute" format="color" />-->
-<!--    <attr name="color_second" format="color" />-->
-
-<!--    <attr name="second_hand_width" format="float" />-->
-<!--    <attr name="minute_hand_width" format="float" />-->
-<!--    <attr name="hour_hand_width" format="float" />-->
+    <attr name="color_hour" format="color" />
+    <attr name="color_second" format="color" />
+    <attr name="color_minute" format="color" />
 
 </resources>

@@ -10,15 +10,14 @@
         android:id="@+id/clock_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintVertical_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:color_hour="@color/color_hour"
-        app:color_second="@color/color_second"
-        app:color_minute="@color/color_minute"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        app:hourHandColor="?attr/color_hour"
+        app:minuteHandColor="?attr/color_minute"
+        app:secondHandColor="?attr/color_second"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

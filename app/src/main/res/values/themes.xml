@@ -12,5 +12,9 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="color_second">@color/color_second</item>
+        <item name="color_minute">@color/color_minute</item>
+        <item name="color_hour">@color/color_hour</item>
+
     </style>
 </resources>

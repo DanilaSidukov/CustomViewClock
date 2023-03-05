@@ -5,17 +5,16 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color.BLACK
+import android.graphics.Color.RED
 import android.graphics.Paint
 import android.os.Build
 import android.util.AttributeSet
-import android.util.TypedValue
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.core.animation.doOnEnd
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.withRotation
 import com.sidukov.customviewclock.R
@@ -42,17 +41,43 @@ class ClockView @JvmOverloads constructor(
 
     private var imageClock: ImageView
 
-    lateinit var handSecond: Paint
-    lateinit var handMinute: Paint
-    lateinit var handHour: Paint
+    private lateinit var handSecondPaint: Paint
+    private lateinit var handMinutePaint: Paint
+    private lateinit var handHourPaint: Paint
 
     init {
         val view = View.inflate(context, R.layout.clock_layout, this)
         imageClock = view.findViewById(R.id.image_clock)
 
-        handSecond = paintHand(attrs, 1)
-        handMinute = paintHand(attrs, 2)
-        handHour = paintHand(attrs, 3)
+        context.withStyledAttributes(attrs, R.styleable.ClockView) {
+
+            handHourPaint = Paint().apply {
+                isAntiAlias = true
+                style = Paint.Style.STROKE
+                color = getColor(R.styleable.ClockView_hourHandColor, RED)
+                strokeWidth = getFloat(
+                    R.styleable.ClockView_hourHandWidth, 9f
+                )
+            }
+
+            handMinutePaint = Paint().apply {
+                isAntiAlias = true
+                style = Paint.Style.STROKE
+                color = getColor(R.styleable.ClockView_minuteHandColor, BLACK)
+                strokeWidth = getFloat(
+                    R.styleable.ClockView_minuteHandWidth, 8f
+                )
+            }
+
+            handSecondPaint = Paint().apply {
+                isAntiAlias = true
+                style = Paint.Style.STROKE
+                color = getColor(R.styleable.ClockView_secondHandColor, BLACK)
+                strokeWidth = getFloat(
+                    R.styleable.ClockView_secondHandWidth, 7f
+                )
+            }
+        }
 
         angleSecond = (LocalDateTime.now().second.toFloat() * 6f)
         angleMinute = (LocalDateTime.now().minute.toFloat() * 6f)
@@ -60,9 +85,9 @@ class ClockView @JvmOverloads constructor(
 
         setWillNotDraw(false)
 
-        animateHand(angleSecond, DURATION_SECOND,  1)
-        animateHand(angleMinute, DURATION_MINUTE,  2)
-        animateHand(angleHour, DURATION_HOUR,  3)
+        animateHand(angleSecond, DURATION_SECOND, 1)
+        animateHand(angleMinute, DURATION_MINUTE, 2)
+        animateHand(angleHour, DURATION_HOUR, 3)
 
     }
 
@@ -70,41 +95,19 @@ class ClockView @JvmOverloads constructor(
         return hour + (LocalDateTime.now().minute.toFloat() * 0.015f)
     }
 
-    @SuppressLint("ResourceAsColor")
-    private fun paintHand(attrs: AttributeSet?, handCode: Int): Paint{
-        val hand = Paint().apply {
-            isAntiAlias = true
-            strokeWidth = getHandWidth(attrs, handCode)
-            style = Paint.Style.STROKE
-        }
-        context.withStyledAttributes(attrs, R.styleable.ClockView)  {
-            hand.apply {
-                color = getHandColor(attrs, handCode)
-            }
-        }
-        return hand
+    fun setHourHandColor(color: Int) {
+        handHourPaint.color = color
+        invalidate()
     }
 
-    @SuppressLint("Recycle")
-    private fun getHandWidth(attrs: AttributeSet?, code: Int): Float {
-        val view = context.obtainStyledAttributes(attrs, R.styleable.ClockView)
-        return when(code){
-            1 -> view.getFloat(R.styleable.ClockView_second_hand_width, 7f)
-            2 -> view.getFloat(R.styleable.ClockView_minute_hand_width, 8f)
-            3 -> view.getFloat(R.styleable.ClockView_hour_hand_width, 9f)
-            else -> 7f
-        }
+    fun setMinuteHandColor(color: Int) {
+        handMinutePaint.color = color
+        invalidate()
     }
 
-    @SuppressLint("Recycle")
-    private fun getHandColor(attrs: AttributeSet?, code: Int): Int{
-        val view = context.obtainStyledAttributes(attrs, R.styleable.ClockView)
-        return when(code){
-            1 -> view.getColor(R.styleable.ClockView_color_second, BLACK)
-            2 -> view.getColor(R.styleable.ClockView_color_minute, BLACK)
-            3 -> view.getColor(R.styleable.ClockView_color_hour, BLACK)
-            else -> BLACK
-        }
+    fun setSecondHandColor(color: Int) {
+        handSecondPaint.color = color
+        invalidate()
     }
 
     private fun animateHand(
@@ -194,7 +197,7 @@ class ClockView @JvmOverloads constructor(
                 imageClock.measuredHeight / 1.87f,
                 imageClock.measuredWidth / 2f,
                 imageClock.top.toFloat() + (imageClock.height / 5.5f),
-                handSecond
+                handSecondPaint
             )
         }
         canvas.withRotation(angleMinute,
@@ -206,7 +209,7 @@ class ClockView @JvmOverloads constructor(
                 imageClock.measuredHeight / 1.9f,
                 imageClock.measuredWidth / 2f,
                 imageClock.top.toFloat() + (imageClock.height / 6),
-                handMinute
+                handMinutePaint
             )
         }
         canvas.withRotation(angleHour,
@@ -218,7 +221,7 @@ class ClockView @JvmOverloads constructor(
                 imageClock.measuredHeight / 1.9f,
                 imageClock.measuredWidth / 2f,
                 imageClock.top.toFloat() + (imageClock.height / 4),
-                handHour
+                handHourPaint
             )
         }
     }
